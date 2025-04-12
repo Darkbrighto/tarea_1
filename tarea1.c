@@ -6,7 +6,7 @@
 
 typedef struct {
   int id;
-  char descripcion[256];
+  char descripcion[314];
   char prioridad[10];
   int hora;
 } ticket;
@@ -21,10 +21,10 @@ void mostrarMenuPrincipal() {
 
   puts("1) Registrar paciente");
   puts("2) Asignar prioridad a paciente");
+  puts("3) Mostrar pacientes por prioridad");
   puts("4) Atender al siguiente paciente");
-  puts("5) Mostrar pacientes por prioridad");
-  puts("6) Buscar y mostrar ticket por ID");
-  puts("7) Salir");
+  puts("5) Buscar y mostrar ticket por ID");
+  puts("6) Salir");
 }
 
 // (1)
@@ -203,28 +203,24 @@ void procesar_siguiente_ticket(List *pacientes) {
   }
 
   ticket *mejor = NULL;
-  void *mejor_pos = NULL;
 
-  void *pos = list_first(pacientes);
-  while (pos != NULL) {
-      ticket *t = (ticket *)pos;
-
-      if (mejor == NULL || comparar(t, mejor) < 0) {
-          mejor = t;
-          mejor_pos = pos;
+  // Primera pasada: encontrar el mejor ticket
+  ticket *actual = list_first(pacientes);
+  while (actual != NULL) {
+      if (mejor == NULL || comparar(actual, mejor) < 0) {
+          mejor = actual;
       }
-
-      pos = list_next(pacientes);
+      actual = list_next(pacientes);
   }
 
-  // Recorremos nuevamente para eliminar el mejor
-  pos = list_first(pacientes);
-  while (pos != NULL) {
-      if (pos == mejor_pos) {
-          list_popCurrent(pacientes); // elimina el ticket con highest priority
+  // Segunda pasada: eliminar el ticket encontrado
+  ticket *aux = list_first(pacientes);
+  while (aux != NULL) {
+      if (aux == mejor) {
+          list_popCurrent(pacientes); // elimina el ticket
           break;
       }
-      pos = list_next(pacientes);
+      aux = list_next(pacientes);
   }
 
   // Mostrar el ticket atendido
@@ -236,8 +232,9 @@ void procesar_siguiente_ticket(List *pacientes) {
   printf("Hora de registro: %d\n", mejor->hora);
   printf("--------------------------\n");
 
-  free(mejor); // liberar memoria
+  free(mejor); // liberar memoria del ticket procesado
 }
+
 // (6)
 //
 //
@@ -296,22 +293,22 @@ int main() {
       // Lógica para asignar prioridad
       asignar_prioridad(pacientes);
       break;
-    case '3':
+    case '7':
       mostrar_lista_pacientes(pacientes);
+      break;
+    case '3':
+      // Lógica para mostrar pacientes por prioridad
+      mostrar_lista_ordenada(pacientes);
       break;
     case '4':
       // Lógica para atender al siguiente paciente
       procesar_siguiente_ticket(pacientes);
       break;
     case '5':
-      // Lógica para mostrar pacientes por prioridad
-      mostrar_lista_ordenada(pacientes);
-      break;
-    case '6':
       // Lógica para mostrar ticket por id
       buscar_ticket_por_id(pacientes);
       break;
-    case '7':
+    case '6':
       puts("Saliendo del sistema de gestión hospitalaria...");
       break;
     default:
@@ -319,7 +316,7 @@ int main() {
     }
     presioneTeclaParaContinuar();
 
-  } while (opcion != '7');
+  } while (opcion != '6');
 
   // Liberar recursos, si es necesario
   list_clean(pacientes);
