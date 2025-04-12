@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
+typedef struct
+{
   int id;
   char descripcion[314];
   char prioridad[10];
@@ -13,7 +14,8 @@ typedef struct {
 
 
 // Menú principal
-void mostrarMenuPrincipal() {
+void mostrarMenuPrincipal()
+{
   limpiarPantalla();
   puts("========================================");
   puts("     Sistema de Gestión Hospitalurie    ");
@@ -30,7 +32,8 @@ void mostrarMenuPrincipal() {
 // (1)
 //
 //
-void registrar_paciente(List *pacientes, int *contador_hora) {
+void registrar_paciente(List *pacientes, int *contador_hora) 
+{
   printf("Registrar nuevo paciente\n");
 
   ticket *nuevo = (ticket *)malloc(sizeof(ticket));
@@ -68,7 +71,8 @@ void registrar_paciente(List *pacientes, int *contador_hora) {
 // (2)
 //
 //
-void asignar_prioridad(List *pacientes) {
+void asignar_prioridad(List *pacientes)
+{
   int id_buscar;
   char nueva_prioridad[10];
 
@@ -106,7 +110,9 @@ void asignar_prioridad(List *pacientes) {
 // (3)
 //
 //
-void mostrar_lista_pacientes(List *pacientes) {
+void mostrar_lista_pacientes(List *pacientes)
+{
+  // Aquí implementarías la lógica para recorrer y mostrar los pacientes
   // Mostrar pacientes en la cola de espera
   printf("Pacientes en espera: \n");
   if (list_first(pacientes) == NULL) {
@@ -126,13 +132,13 @@ void mostrar_lista_pacientes(List *pacientes) {
     printf("----------------------------\n");
     t = list_next(pacientes);
   }
-  // Aquí implementarías la lógica para recorrer y mostrar los pacientes
 }
 
 // (4)
 //
 //
-int prioridad_valor(const char *prioridad) {
+int prioridad_valor(const char *prioridad)
+{
   if (strcmp(prioridad, "Alto") == 0) return 3;
   if (strcmp(prioridad, "Medio") == 0) return 2;
   if (strcmp(prioridad, "Bajo") == 0) return 1;
@@ -155,14 +161,15 @@ int comparar(const void *a, const void *b) {
 }
 
 
-void mostrar_lista_ordenada(List *tickets) {
+void mostrar_lista_ordenada(List *tickets)
+{
   if (list_first(tickets) == NULL) {
       printf("No hay tickets pendientes.\n");
       return;
   }
 
   // Crear un array temporal para ordenar
-  int size = list_size(tickets);  // Asumimos que list_size devuelve el número de elementos
+  int size = list_size(tickets);
   ticket *array_tickets = malloc(size * sizeof(ticket));
   if (array_tickets == NULL) {
       printf("Error al asignar memoria.\n");
@@ -175,10 +182,9 @@ void mostrar_lista_ordenada(List *tickets) {
       array_tickets[i] = *t;
   }
 
-  // Ordenar los tickets usando qsort y la función de comparación
+  // Ordenar los tickets usando qsort
   qsort(array_tickets, size, sizeof(ticket), comparar);
 
-  // Mostrar los tickets ordenados
   printf("Tickets pendientes:\n");
   printf("----------------------------\n");
   for (int i = 0; i < size; i++) {
@@ -196,7 +202,8 @@ void mostrar_lista_ordenada(List *tickets) {
 // (5)
 //
 //
-void procesar_siguiente_ticket(List *pacientes) {
+void procesar_siguiente_ticket(List *pacientes)
+{
   if (list_first(pacientes) == NULL) {
       printf("No hay tickets pendientes.\n");
       return;
@@ -238,7 +245,8 @@ void procesar_siguiente_ticket(List *pacientes) {
 // (6)
 //
 //
-void buscar_ticket_por_id(List *tickets) {
+void buscar_ticket_por_id(List *tickets)
+{
   if (list_first(tickets) == NULL) {
       printf("No hay tickets registrados.\n");
       return;

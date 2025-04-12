@@ -21,7 +21,7 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente u
     - Inicia Visual Studio Code.
     - Selecciona `Archivo > Abrir carpeta...` y elige la carpeta donde descomprimiste el proyecto.
 3. **Compila el código**
-    - Abre el archivo principal (por ejemplo, `main.c`).
+    - Abre el archivo principal (por ejemplo, `tarea1.c`).
     - Abre la terminal integrada (`Terminal > Nueva terminal`).
     - En la terminal, compila el programa con el siguiente comando (ajusta el nombre si el archivo principal tiene otro nombre):
         
