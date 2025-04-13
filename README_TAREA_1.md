@@ -62,6 +62,7 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente u
 **Paso 1: Registrar un Nuevo Paciente**
 
 Se comienza registrando un nuevo paciente que acaba de llegar al hospital.
+El ID debe ser un número, no debe ser ni una letra ni un signo.
 
 ```
 Opción seleccionada: 1) Registrar paciente
