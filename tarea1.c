@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct
 {
   int id;
   char descripcion[314];
   char prioridad[10];
-  int hora;
+  time_t hora;
 } ticket;
 
 
@@ -32,14 +33,12 @@ void mostrarMenuPrincipal()
 // (1)
 //
 //
-void registrar_paciente(List *pacientes, int *contador_hora) 
+void registrar_paciente(List *pacientes) 
 {
   printf("Registrar nuevo paciente\n");
 
   ticket *nuevo = (ticket *)malloc(sizeof(ticket));
-  if (nuevo == NULL) {
-      return;
-  }
+  if (nuevo == NULL) return;
 
   printf("ID del ticket: ");
   scanf("%d", &nuevo->id);
@@ -61,12 +60,11 @@ void registrar_paciente(List *pacientes, int *contador_hora)
   nuevo->descripcion[strcspn(nuevo->descripcion, "\n")] = 0;
 
   strcpy(nuevo->prioridad, "Bajo");
-  nuevo->hora = (*contador_hora)++;
+  nuevo->hora = time(NULL); // Hora real
 
   list_pushBack(pacientes, nuevo);
   printf("Ticket registrado correctamente.\n");
 }
-
 
 // (2)
 //
@@ -112,24 +110,26 @@ void asignar_prioridad(List *pacientes)
 //
 void mostrar_lista_pacientes(List *pacientes)
 {
-  // Aquí implementarías la lógica para recorrer y mostrar los pacientes
-  // Mostrar pacientes en la cola de espera
-  printf("Pacientes en espera: \n");
+  printf("Pacientes en espera:\n");
   if (list_first(pacientes) == NULL) {
     printf("No hay pacientes en espera.\n");
     return;
   }
 
-  printf("Pacientes en espera:\n");
   printf("----------------------------\n");
 
   ticket *t = list_first(pacientes);
   while (t != NULL) {
+    char hora_formateada[64];
+    struct tm *info_hora = localtime(&t->hora);
+    strftime(hora_formateada, sizeof(hora_formateada), "%d-%m-%Y %H:%M:%S", info_hora);
+
     printf("ID: %d\n", t->id);
     printf("Descripción: %s\n", t->descripcion);
     printf("Prioridad: %s\n", t->prioridad);
-    printf("Hora de llegada: %d\n", t->hora);
+    printf("Hora de llegada: %s\n", hora_formateada);
     printf("----------------------------\n");
+    
     t = list_next(pacientes);
   }
 }
@@ -137,8 +137,7 @@ void mostrar_lista_pacientes(List *pacientes)
 // (4)
 //
 //
-int prioridad_valor(const char *prioridad)
-{
+int prioridad_valor(const char *prioridad) {
   if (strcmp(prioridad, "Alto") == 0) return 3;
   if (strcmp(prioridad, "Medio") == 0) return 2;
   if (strcmp(prioridad, "Bajo") == 0) return 1;
@@ -154,11 +153,12 @@ int comparar(const void *a, const void *b) {
 
   // Comparar primero por prioridad (de mayor a menor)
   if (prioridad_a != prioridad_b)
-      return prioridad_b - prioridad_a; // Alto primero
+      return prioridad_b - prioridad_a; // "Alto" primero
 
-  // Si tienen la misma prioridad, comparar por hora (de menor a mayor)
-  return ticket_a->hora - ticket_b->hora;
+  // Si la prioridad es igual, comparar por hora (el más antiguo primero)
+  return (int)difftime(ticket_a->hora, ticket_b->hora);
 }
+
 
 
 void mostrar_lista_ordenada(List *tickets)
@@ -188,12 +188,13 @@ void mostrar_lista_ordenada(List *tickets)
   printf("Tickets pendientes:\n");
   printf("----------------------------\n");
   for (int i = 0; i < size; i++) {
-      printf("ID: %d\n", array_tickets[i].id);
-      printf("Descripción: %s\n", array_tickets[i].descripcion);
-      printf("Prioridad: %s\n", array_tickets[i].prioridad);
-      printf("Hora de llegada: %d\n", array_tickets[i].hora);
-      printf("----------------------------\n");
-  }
+    printf("ID: %d\n", array_tickets[i].id);
+    printf("Descripción: %s\n", array_tickets[i].descripcion);
+    printf("Prioridad: %s\n", array_tickets[i].prioridad);
+    printf("Hora de llegada: %s", ctime(&array_tickets[i].hora));
+    printf("----------------------------\n");
+}
+
 
   // Liberar la memoria temporal
   free(array_tickets);
@@ -202,54 +203,49 @@ void mostrar_lista_ordenada(List *tickets)
 // (5)
 //
 //
-void procesar_siguiente_ticket(List *pacientes)
-{
+void procesar_siguiente_ticket(List *pacientes) {
   if (list_first(pacientes) == NULL) {
-      printf("No hay tickets pendientes.\n");
-      return;
+    printf("No hay tickets pendientes.\n");
+    return;
   }
 
   ticket *mejor = NULL;
-
-  // Primera pasada: encontrar el mejor ticket
   ticket *actual = list_first(pacientes);
   while (actual != NULL) {
-      if (mejor == NULL || comparar(actual, mejor) < 0) {
-          mejor = actual;
-      }
-      actual = list_next(pacientes);
+    if (mejor == NULL || comparar(actual, mejor) < 0) {
+      mejor = actual;
+    }
+    actual = list_next(pacientes);
   }
 
-  // Segunda pasada: eliminar el ticket encontrado
   ticket *aux = list_first(pacientes);
   while (aux != NULL) {
-      if (aux == mejor) {
-          list_popCurrent(pacientes); // elimina el ticket
-          break;
-      }
-      aux = list_next(pacientes);
+    if (aux == mejor) {
+      list_popCurrent(pacientes);
+      break;
+    }
+    aux = list_next(pacientes);
   }
 
-  // Mostrar el ticket atendido
   printf("--------------------------\n");
   printf("Ticket a atender:\n");
   printf("ID: %d\n", mejor->id);
   printf("Descripción: %s\n", mejor->descripcion);
   printf("Prioridad: %s\n", mejor->prioridad);
-  printf("Hora de registro: %d\n", mejor->hora);
+  printf("Hora de registro: %s", ctime(&mejor->hora)); // Hora en formato legible
   printf("--------------------------\n");
 
-  free(mejor); // liberar memoria del ticket procesado
+  free(mejor);
 }
+
 
 // (6)
 //
 //
-void buscar_ticket_por_id(List *tickets)
-{
+void buscar_ticket_por_id(List *tickets) {
   if (list_first(tickets) == NULL) {
-      printf("No hay tickets registrados.\n");
-      return;
+    printf("No hay tickets registrados.\n");
+    return;
   }
 
   int id_buscado;
@@ -258,17 +254,17 @@ void buscar_ticket_por_id(List *tickets)
 
   ticket *t = list_first(tickets);
   while (t != NULL) {
-      if (t->id == id_buscado) {
-          printf("--------------------------\n");
-          printf("Ticket encontrado:\n");
-          printf("ID: %d\n", t->id);
-          printf("Descripción: %s\n", t->descripcion);
-          printf("Prioridad: %s\n", t->prioridad);
-          printf("Hora de registro: %d\n", t->hora);
-          printf("--------------------------\n");
-          return;
-      }
-      t = list_next(tickets);
+    if (t->id == id_buscado) {
+      printf("--------------------------\n");
+      printf("Ticket encontrado:\n");
+      printf("ID: %d\n", t->id);
+      printf("Descripción: %s\n", t->descripcion);
+      printf("Prioridad: %s\n", t->prioridad);
+      printf("Hora de registro: %s", ctime(&t->hora)); // Hora en formato legible
+      printf("--------------------------\n");
+      return;
+    }
+    t = list_next(tickets);
   }
 
   printf("No se encontró ningún ticket con ID %d.\n", id_buscado);
@@ -280,7 +276,6 @@ void buscar_ticket_por_id(List *tickets)
 //
 int main() {
   char opcion;
-  int contador_hora = 0;
   List *pacientes = list_create(); // puedes usar una lista para gestionar los pacientes
   if (pacientes == NULL) {
     printf("No se pudo crear la lista.\n");
@@ -295,7 +290,7 @@ int main() {
 
     switch (opcion) {
     case '1':
-      registrar_paciente(pacientes, &contador_hora);
+      registrar_paciente(pacientes);
       break;
     case '2':
       // Lógica para asignar prioridad
