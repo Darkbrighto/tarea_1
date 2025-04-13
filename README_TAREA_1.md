@@ -1,4 +1,4 @@
-# Sistema de Gestión de TICKETS DE PACIENTES en Hospital
+# Sistema de Gestión de TICKETS DE PACIENTES en Hospitalu
 
 ## Descripción
 
