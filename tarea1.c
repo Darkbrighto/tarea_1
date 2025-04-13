@@ -122,7 +122,7 @@ void mostrar_lista_pacientes(List *pacientes)
   while (t != NULL) {
     char hora_formateada[64];
     struct tm *info_hora = localtime(&t->hora);
-    strftime(hora_formateada, sizeof(hora_formateada), "%d-%m-%Y %H:%M:%S", info_hora);
+    strftime(hora_formateada, sizeof(hora_formateada), "%Y-%m-%d %H:%M:%S", info_hora);
 
     printf("ID: %d\n", t->id);
     printf("Descripción: %s\n", t->descripcion);
@@ -312,7 +312,7 @@ int main() {
       buscar_ticket_por_id(pacientes);
       break;
     case '6':
-      puts("Saliendo del sistema de gestión hospitalaria...");
+      puts("Saliendo del sistema de gestión hospitaluria...");
       break;
     default:
       puts("Opción no válida. Por favor, intente de nuevo.");
